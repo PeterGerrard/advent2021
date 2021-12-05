@@ -1,3 +1,5 @@
+module Day03 where
+
 import Data.List
 
 type ReportLine = [Bool]
@@ -37,4 +39,8 @@ solve2 r = oxygen * co2
     oxygen = toBinary $ filterReport calculateBit r
     co2 = toBinary $ filterReport (not . calculateBit) r
 
-main = interact $ show . solve2 . map (map (== '1')) . lines
+parse :: String -> Report
+parse = map (map (== '1')) . lines
+
+print :: Integer -> String
+print = show
