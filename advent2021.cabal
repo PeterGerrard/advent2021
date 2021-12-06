@@ -38,6 +38,7 @@ executable main
     Day03
     Day04
     Day05
+    Day06
   -- other-extensions:
   build-depends:       base >=4.13, split, containers
   hs-source-dirs:      src/
@@ -73,6 +74,14 @@ library Day04
 
 library Day05
   exposed-modules:     Day05
+  -- other-modules:
+  -- other-extensions:
+  build-depends:       base >=4.13, split, containers
+  hs-source-dirs:      src/
+  default-language:    Haskell2010
+
+library Day06
+  exposed-modules:     Day06
   -- other-modules:
   -- other-extensions:
   build-depends:       base >=4.13, split, containers
