@@ -14,26 +14,6 @@ type Input = [([DigitDisplay], [DigitDisplay])]
 
 type Output = [[Integer]]
 
-getDigitDisplay :: Integer -> DigitDisplay
-getDigitDisplay x = case x of
-  0 -> ['a', 'b', 'c', 'e', 'f', 'g']
-  1 -> ['c', 'f']
-  2 -> ['a', 'c', 'd', 'e', 'g']
-  3 -> ['a', 'c', 'd', 'f', 'g']
-  4 -> ['b', 'c', 'd', 'f']
-  5 -> ['a', 'b', 'd', 'f', 'g']
-  6 -> ['a', 'b', 'd', 'e', 'f', 'g']
-  7 -> ['a', 'c', 'f']
-  8 -> ['a', 'b', 'c', 'd', 'e', 'f', 'g']
-  9 -> ['a', 'b', 'c', 'd', 'f', 'g']
-  _ -> error "Must be a digit"
-
-allDisplays :: [DigitDisplay]
-allDisplays = map getDigitDisplay [0 .. 9]
-
-getMatching :: DigitDisplay -> Map Segment Segment -> [DigitDisplay]
-getMatching d m = filter (\x -> length x == length d && all (\s -> maybe True (`elem` x) (Map.lookup s m)) d) allDisplays
-
 parseLine :: String -> ([DigitDisplay], [DigitDisplay])
 parseLine s = (i, d)
   where
