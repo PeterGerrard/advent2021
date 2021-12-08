@@ -1,9 +1,10 @@
 module Day08 where
 
-import Data.Bool (Bool (True))
+import Data.List
 import Data.List.Split
 import Data.Map (Map)
 import qualified Data.Map as Map
+import Data.Maybe
 
 type Segment = Char
 
@@ -36,7 +37,7 @@ getMatching d m = filter (\x -> length x == length d && all (\s -> maybe True (`
 parseLine :: String -> ([DigitDisplay], [DigitDisplay])
 parseLine s = (i, d)
   where
-    [i, d] = map words $ splitOn " | " s
+    [i, d] = map (map sort . words) $ splitOn " | " s
 
 parse :: String -> Input
 parse = map parseLine . lines
@@ -67,8 +68,27 @@ solve1 =
         . snd
     )
 
-solve2 :: Input -> Output
-solve2 _ = []
+findMapping :: [DigitDisplay] -> Map DigitDisplay Integer
+findMapping xs = Map.fromList $ zip [x0, x1, x2, x3, x4, x5, x6, x7, x8, x9] [0 ..]
+  where
+    x1 = head $ filter ((== 2) . length) xs
+    x4 = head $ filter ((== 4) . length) xs
+    x7 = head $ filter ((== 3) . length) xs
+    x8 = head $ filter ((== 7) . length) xs
+    x235 = filter ((== 5) . length) xs
+    x069 = filter ((== 6) . length) xs
+    ([x6], x09) = partition ((== 1) . length . (x1 \\)) x069
+    ([x3], x25) = partition (null . (x1 \\)) x235
+    ([x9], [x0]) = partition (null . (x3 \\)) x09
+    ([x5], [x2]) = partition ((== 1) . length . (x6 \\)) x25
 
-print2 :: Output -> String
-print2 _ = ""
+getResult :: ([DigitDisplay], [DigitDisplay]) -> Integer
+getResult (xs, rs) = foldl (\a b -> 10 * a + b) 0 $ map (fromJust . flip Map.lookup ms) rs
+  where
+    ms = findMapping xs
+
+solve2 :: Input -> [Integer]
+solve2 = map getResult
+
+print2 :: [Integer] -> String
+print2 = show . sum
