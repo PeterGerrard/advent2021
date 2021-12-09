@@ -6,6 +6,7 @@ import qualified Day05
 import qualified Day06
 import qualified Day07
 import qualified Day08
+import qualified Day09
 import System.Environment
 
 padLeft :: Int -> a -> [a] -> [a]
@@ -21,6 +22,7 @@ getSolve1 n = case n of
   6 -> Day06.print . Day06.solve1 . Day06.parse
   7 -> Day07.print . Day07.solve1 . Day07.parse
   8 -> Day08.print1 . Day08.solve1 . Day08.parse
+  7 -> Day09.print . Day09.solve1 . Day09.parse
 
 getSolve2 :: Integer -> (String -> String)
 getSolve2 n = case n of
