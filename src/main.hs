@@ -22,7 +22,7 @@ getSolve1 n = case n of
   6 -> Day06.print . Day06.solve1 . Day06.parse
   7 -> Day07.print . Day07.solve1 . Day07.parse
   8 -> Day08.print1 . Day08.solve1 . Day08.parse
-  7 -> Day09.print . Day09.solve1 . Day09.parse
+  9 -> Day09.print . Day09.solve1 . Day09.parse
 
 getSolve2 :: Integer -> (String -> String)
 getSolve2 n = case n of
@@ -34,6 +34,7 @@ getSolve2 n = case n of
   6 -> Day06.print . Day06.solve2 . Day06.parse
   7 -> Day07.print . Day07.solve2 . Day07.parse
   8 -> Day08.print2 . Day08.solve2 . Day08.parse
+  9 -> Day09.print . Day09.solve2 . Day09.parse
 
 getSolver :: Integer -> (Integer -> (String -> String))
 getSolver n = if n == 1 then getSolve1 else getSolve2
