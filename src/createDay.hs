@@ -1,41 +1,63 @@
+import Data.Text (Text)
+import qualified Data.Text as Text
+import qualified Data.Text.IO as Text
 import System.Environment
 
 padLeft :: Int -> a -> [a] -> [a]
 padLeft n x xs = replicate (n - length xs) x ++ xs
 
-cabalEntry :: Integer -> String
-cabalEntry x =
+cabalEntry :: String -> String
+cabalEntry fileName =
   unlines
     [ "",
-      "executable day" ++ padLeft 2 '0' (show x),
-      "  main-is:             day" ++ padLeft 2 '0' (show x) ++ ".hs",
-      "  -- other-modules:",
-      "  -- other-extensions:",
+      "library " ++ fileName,
+      "  exposed-modules:     " ++ fileName,
       "  build-depends:       base >=4.13, split, containers",
       "  hs-source-dirs:      src/",
       "  default-language:    Haskell2010"
     ]
 
-sourceCode :: Integer -> String
-sourceCode _ =
+sourceCode :: String -> String
+sourceCode modName =
   unlines
-    ["main = interact $ id"]
+    [ "module " ++ modName ++ " where",
+      "",
+      "parse :: String -> String",
+      "parse = id",
+      "",
+      "print :: String -> String",
+      "print = id",
+      "",
+      "solve1 :: String -> String",
+      "solve1 = id",
+      "",
+      "solve2 :: String -> String",
+      "solve2 = id"
+    ]
 
-fileName :: Integer -> String -> String
-fileName n ext = "day" ++ padLeft 2 '0' (show n) ++ "." ++ ext
+createInputFile :: String -> IO ()
+createInputFile fileName = writeFile ("./inputs/" ++ fileName ++ ".txt") ""
 
-createInputFile :: Integer -> IO ()
-createInputFile n = writeFile ("./inputs/" ++ fileName n "txt") ""
+createSourceFile :: String -> IO ()
+createSourceFile fileName = writeFile ("./src/" ++ fileName ++ ".hs") $ sourceCode fileName
 
-createSourceFile :: Integer -> IO ()
-createSourceFile n = writeFile ("./src/" ++ fileName n "hs") $ sourceCode n
+updateMain :: Integer -> String -> Text -> Text
+updateMain num name =
+  Text.replace (Text.pack " -- solve1Insert") (Text.pack $ "\n  " ++ show num ++ " -> " ++ name ++ ".parse  . " ++ name ++ ".solve1 . " ++ name ++ ".parse --solve1Insert")
+    . Text.replace (Text.pack " -- solve2Insert") (Text.pack $ "\n  " ++ show num ++ " -> " ++ name ++ ".parse  . " ++ name ++ ".solve2 . " ++ name ++ ".parse --solve2Insert")
+    . Text.replace (Text.pack " -- imports") (Text.pack $ "\nimport qualified " ++ name ++ " --imports")
 
-createCabalEntry :: Integer -> IO ()
-createCabalEntry n = appendFile "advent2021.cabal" $ cabalEntry n
+updateCabal :: String -> Text -> Text
+updateCabal name =
+  Text.replace (Text.pack "-- mainDeps") (Text.pack $ name ++ "\n    -- mainDeps")
+    . flip Text.append (Text.pack $ cabalEntry name)
 
 main = do
   (n : _) <- getArgs
-  let num = read n
-  createInputFile num
-  createSourceFile num
-  createCabalEntry num
+  let name = "Day" ++ padLeft 2 '0' n
+  createInputFile name
+  createSourceFile name
+  mainIn <- Text.readFile "./src/main.hs"
+  cabalIn <- Text.readFile "./advent2021.cabal"
+  Text.writeFile "./src/main.hs" $ updateMain (read n) name mainIn
+  Text.writeFile "./advent2021.cabal" $ updateCabal name cabalIn
