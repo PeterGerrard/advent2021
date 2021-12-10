@@ -14,7 +14,18 @@ cabalEntry fileName =
       "  exposed-modules:     " ++ fileName,
       "  build-depends:       base >=4.13, split, containers",
       "  hs-source-dirs:      src/",
-      "  default-language:    Haskell2010"
+      "  default-language:    Haskell2010",
+      "",
+      "test-suite " ++ fileName ++ "Tests",
+      "  type: exitcode-stdio-1.0",
+      "  main-is: " ++ fileName ++ ".tests.hs",
+      "  hs-source-dirs:",
+      "    tests",
+      "    src",
+      "  build-depends: base >=4.13, split, containers, HUnit",
+      "  other-modules:",
+      "    " ++ fileName,
+      "  default-language: Haskell2010"
     ]
 
 sourceCode :: String -> String
@@ -35,11 +46,35 @@ sourceCode modName =
       "solve2 = id"
     ]
 
+testCode :: String -> String
+testCode modName =
+  unlines
+    [ "module Main (main) where",
+      "",
+      "import qualified " ++ modName,
+      "import System.Exit",
+      "import Test.HUnit",
+      "",
+      "main :: IO ()",
+      "main = do",
+      "  counts2 <-",
+      "    runTestTT",
+      "      ( test",
+      "          [",
+      "              TestCase (assertEqual \"Example\" 2 (1+1)",
+      "          ]",
+      "      )",
+      "  if errors counts2 + failures counts2 == 0 then exitSuccess else exitFailure"
+    ]
+
 createInputFile :: String -> IO ()
 createInputFile fileName = writeFile ("./inputs/" ++ fileName ++ ".txt") ""
 
 createSourceFile :: String -> IO ()
 createSourceFile fileName = writeFile ("./src/" ++ fileName ++ ".hs") $ sourceCode fileName
+
+createTestFile :: String -> IO ()
+createTestFile fileName = writeFile ("./tests/" ++ fileName ++ ".tests.hs") $ testCode fileName
 
 updateMain :: Integer -> String -> Text -> Text
 updateMain num name =
@@ -57,6 +92,7 @@ main = do
   let name = "Day" ++ padLeft 2 '0' n
   createInputFile name
   createSourceFile name
+  createTestFile name
   mainIn <- Text.readFile "./src/main.hs"
   cabalIn <- Text.readFile "./advent2021.cabal"
   Text.writeFile "./src/main.hs" $ updateMain (read n) name mainIn
