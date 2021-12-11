@@ -61,7 +61,7 @@ testCode modName =
       "    runTestTT",
       "      ( test",
       "          [",
-      "              TestCase (assertEqual \"Example\" 2 (1+1)",
+      "              TestCase (assertEqual \"Example\" 2 (1+1))",
       "          ]",
       "      )",
       "  if errors counts2 + failures counts2 == 0 then exitSuccess else exitFailure"
@@ -78,8 +78,8 @@ createTestFile fileName = writeFile ("./tests/" ++ fileName ++ ".tests.hs") $ te
 
 updateMain :: Integer -> String -> Text -> Text
 updateMain num name =
-  Text.replace (Text.pack " -- solve1Insert") (Text.pack $ "\n  " ++ show num ++ " -> " ++ name ++ ".parse  . " ++ name ++ ".solve1 . " ++ name ++ ".parse --solve1Insert")
-    . Text.replace (Text.pack " -- solve2Insert") (Text.pack $ "\n  " ++ show num ++ " -> " ++ name ++ ".parse  . " ++ name ++ ".solve2 . " ++ name ++ ".parse --solve2Insert")
+  Text.replace (Text.pack " -- solve1Insert") (Text.pack $ "\n  " ++ show num ++ " -> " ++ name ++ ".print  . " ++ name ++ ".solve1 . " ++ name ++ ".parse --solve1Insert")
+    . Text.replace (Text.pack " -- solve2Insert") (Text.pack $ "\n  " ++ show num ++ " -> " ++ name ++ ".print  . " ++ name ++ ".solve2 . " ++ name ++ ".parse --solve2Insert")
     . Text.replace (Text.pack " -- imports") (Text.pack $ "\nimport qualified " ++ name ++ " --imports")
 
 updateCabal :: String -> Text -> Text
