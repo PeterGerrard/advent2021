@@ -30,7 +30,7 @@ getSolve1 n = case n of
   10 -> Day10.print . Day10.solve1 . Day10.parse
   11 -> Day11.print . Day11.solve1 . Day11.parse
   12 -> Day12.print . Day12.solve1 . Day12.parse
-  13 -> Day13.print . Day13.solve1 . Day13.parse --solve1Insert
+  13 -> Day13.print . Day13.solve1 . Day13.parse -- solve1Insert
 
 getSolve2 :: Integer -> (String -> String)
 getSolve2 n = case n of
@@ -46,7 +46,7 @@ getSolve2 n = case n of
   10 -> Day10.print . Day10.solve2 . Day10.parse
   11 -> Day11.print . Day11.solve2 . Day11.parse
   12 -> Day12.print . Day12.solve2 . Day12.parse
-  13 -> Day13.print2 . Day13.solve2 . Day13.parse --solve2Insert
+  13 -> Day13.print2 . Day13.solve2 . Day13.parse -- solve2Insert
 
 getSolver :: Integer -> (Integer -> (String -> String))
 getSolver n = if n == 1 then getSolve1 else getSolve2

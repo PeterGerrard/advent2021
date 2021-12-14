@@ -78,9 +78,9 @@ createTestFile fileName = writeFile ("./tests/" ++ fileName ++ ".tests.hs") $ te
 
 updateMain :: Integer -> String -> Text -> Text
 updateMain num name =
-  Text.replace (Text.pack " -- solve1Insert") (Text.pack $ "\n  " ++ show num ++ " -> " ++ name ++ ".print  . " ++ name ++ ".solve1 . " ++ name ++ ".parse --solve1Insert")
-    . Text.replace (Text.pack " -- solve2Insert") (Text.pack $ "\n  " ++ show num ++ " -> " ++ name ++ ".print  . " ++ name ++ ".solve2 . " ++ name ++ ".parse --solve2Insert")
-    . Text.replace (Text.pack " -- imports") (Text.pack $ "\nimport qualified " ++ name ++ " --imports")
+  Text.replace (Text.pack " -- solve1Insert") (Text.pack $ "\n  " ++ show num ++ " -> " ++ name ++ ".print  . " ++ name ++ ".solve1 . " ++ name ++ ".parse -- solve1Insert")
+    . Text.replace (Text.pack " -- solve2Insert") (Text.pack $ "\n  " ++ show num ++ " -> " ++ name ++ ".print  . " ++ name ++ ".solve2 . " ++ name ++ ".parse -- solve2Insert")
+    . Text.replace (Text.pack " -- imports") (Text.pack $ "\nimport qualified " ++ name ++ " -- imports")
 
 updateCabal :: String -> Text -> Text
 updateCabal name =
