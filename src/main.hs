@@ -10,7 +10,8 @@ import qualified Day09
 import qualified Day10
 import qualified Day11
 import qualified Day12
-import qualified Day13 --imports
+import qualified Day13
+import qualified Day14 -- imports
 import System.Environment
 
 padLeft :: Int -> a -> [a] -> [a]
@@ -30,7 +31,8 @@ getSolve1 n = case n of
   10 -> Day10.print . Day10.solve1 . Day10.parse
   11 -> Day11.print . Day11.solve1 . Day11.parse
   12 -> Day12.print . Day12.solve1 . Day12.parse
-  13 -> Day13.print . Day13.solve1 . Day13.parse -- solve1Insert
+  13 -> Day13.print . Day13.solve1 . Day13.parse
+  14 -> Day14.print . Day14.solve1 . Day14.parse -- solve1Insert
 
 getSolve2 :: Integer -> (String -> String)
 getSolve2 n = case n of
@@ -46,7 +48,8 @@ getSolve2 n = case n of
   10 -> Day10.print . Day10.solve2 . Day10.parse
   11 -> Day11.print . Day11.solve2 . Day11.parse
   12 -> Day12.print . Day12.solve2 . Day12.parse
-  13 -> Day13.print2 . Day13.solve2 . Day13.parse -- solve2Insert
+  13 -> Day13.print2 . Day13.solve2 . Day13.parse
+  14 -> Day14.print . Day14.solve2 . Day14.parse -- solve2Insert
 
 getSolver :: Integer -> (Integer -> (String -> String))
 getSolver n = if n == 1 then getSolve1 else getSolve2

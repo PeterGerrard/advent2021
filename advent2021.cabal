@@ -46,6 +46,7 @@ executable main
     Day11
     Day12
     Day13
+    Day14
     -- mainDeps
   -- other-extensions:
   build-depends:       base >=4.13, split, containers
@@ -187,4 +188,21 @@ test-suite Day13Tests
   build-depends: base >=4.13, split, containers, HUnit
   other-modules:
     Day13
+  default-language: Haskell2010
+
+library Day14
+  exposed-modules:     Day14
+  build-depends:       base >=4.13, split, containers
+  hs-source-dirs:      src/
+  default-language:    Haskell2010
+
+test-suite Day14Tests
+  type: exitcode-stdio-1.0
+  main-is: Day14.tests.hs
+  hs-source-dirs:
+    tests
+    src
+  build-depends: base >=4.13, split, containers, HUnit
+  other-modules:
+    Day14
   default-language: Haskell2010
