@@ -31,7 +31,9 @@ dijkstra g s e = go (toSortedList [ToVisit s [s] 0]) Set.empty
         | n == e -> (path, cost)
         | n `Set.member` visited -> go rest visited
         | otherwise -> go (addAdjacent v rest) (Set.insert n visited)
-    addAdjacent (ToVisit e path cost) l = foldl (flip SortedList.insert) l $ map (\(e2, c) -> ToVisit e2 (e2 : path) (c + cost)) $ fromMaybe [] (Map.lookup e (edges g))
+        where
+          addAdjacent (ToVisit e path cost) l = foldl (flip SortedList.insert) l $ map (\(e2, c) -> ToVisit e2 (e2 : path) (c + cost)) . filter (\(e2, c) -> not $ Set.member e2 visited) $ fromMaybe [] (Map.lookup e es)
+    es = edges g
 
 adjacent :: (Integer, Integer) -> [(Integer, Integer)]
 adjacent (x, y) = [(x -1, y), (x + 1, y), (x, y -1), (x, y + 1)]
@@ -55,21 +57,15 @@ solve1 g = dijkstra g (0, 0) (maximum $ map fst ns, maximum $ map snd ns)
     ns = nodes g
 
 wrap :: Integer -> Integer
-wrap n = if n < 10 then n else wrap (n -9)
+wrap n = if n < 10 then n else wrap (n - 9)
 
-tileX :: Integer -> Graph (Integer, Integer) -> Graph (Integer, Integer)
-tileX t g = Graph {nodes = ns, edges = Map.fromList [(x, [(a, c) | a <- adjacent x, Just c <- [Map.lookup a nodeCosts]]) | x <- ns], nodeCost = nodeCosts}
+tile :: Integer -> Graph (Integer, Integer) -> Graph (Integer, Integer)
+tile t g = Graph {nodes = ns, edges = Map.fromList [(x, [(a, c) | a <- adjacent x, Just c <- [Map.lookup a nodeCosts]]) | x <- ns], nodeCost = nodeCosts}
   where
     ns = Map.keys nodeCosts
-    nodeCosts = Map.fromList $ concatMap (\n -> map (\((x, y), c) -> ((x + (mx + 1) * n, y), wrap (c + n))) $ Map.toList $ nodeCost g) [0 .. t -1]
+    nodeCosts = Map.fromList $ concatMap (\(xo, yo) -> map (\((x, y), c) -> ((x + (mx + 1) * xo, y + (my + 1) * yo), wrap (c + xo + yo))) $ Map.toList $ nodeCost g) [(xo, yo) | xo <- [0 .. t -1], yo <- [0 .. t -1]]
+    my = maximum . map snd $ nodes g
     mx = maximum . map fst $ nodes g
 
-tileY :: Integer -> Graph (Integer, Integer) -> Graph (Integer, Integer)
-tileY t g = Graph {nodes = ns, edges = Map.fromList [(x, [(a, c) | a <- adjacent x, Just c <- [Map.lookup a nodeCosts]]) | x <- ns], nodeCost = nodeCosts}
-  where
-    ns = Map.keys nodeCosts
-    nodeCosts = Map.fromList $ concatMap (\n -> map (\((x, y), c) -> ((x, y + (my + 1) * n), wrap (c + n))) $ Map.toList $ nodeCost g) [0 .. t -1]
-    my = maximum . map snd $ nodes g
-
 solve2 :: Graph (Integer, Integer) -> ([(Integer, Integer)], Integer)
-solve2 = solve1 . tileY 5 . tileX 5
+solve2 = solve1 . tile 5
