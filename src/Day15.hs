@@ -5,16 +5,6 @@ import qualified Data.Map.Strict as Map
 import Data.Maybe
 import Data.Set (Set)
 import qualified Data.Set as Set
-import Data.SortedList (SortedList, toSortedList)
-import qualified Data.SortedList as SortedList
-
-data ToVisitNodes a = ToVisit a [a] Integer
-
-instance Eq (ToVisitNodes a) where
-  (==) (ToVisit _ _ a) (ToVisit _ _ b) = a == b
-
-instance Ord (ToVisitNodes a) where
-  compare (ToVisit _ _ x) (ToVisit _ _ y) = compare x y
 
 data Graph a = Graph
   { nodes :: [a],
@@ -22,17 +12,16 @@ data Graph a = Graph
     nodeCost :: Map a Integer
   }
 
-dijkstra :: (Eq a, Ord a) => Graph a -> a -> a -> ([a], Integer)
-dijkstra g s e = go (toSortedList [ToVisit s [s] 0]) Set.empty
+dijkstra :: (Eq a, Ord a, Show a) => Graph a -> a -> a -> Integer
+dijkstra g s e = go (Set.singleton (0, s)) Set.empty
   where
-    go toVisit visited = case SortedList.uncons toVisit of
-      Nothing -> error "Cannot reach end"
-      Just (v@(ToVisit n path cost), rest)
-        | n == e -> (path, cost)
+    go toVisit visited = case Set.deleteFindMin toVisit of
+      (v@(cost, n), rest)
+        | n == e -> cost
         | n `Set.member` visited -> go rest visited
-        | otherwise -> go (addAdjacent v rest) (Set.insert n visited)
+        | otherwise -> go (Set.union rest $ adjacent v) (Set.insert n visited)
         where
-          addAdjacent (ToVisit e path cost) l = foldl (flip SortedList.insert) l $ map (\(e2, c) -> ToVisit e2 (e2 : path) (c + cost)) . filter (\(e2, c) -> not $ Set.member e2 visited) $ fromMaybe [] (Map.lookup e es)
+          adjacent (cost, e) = Set.fromList . map (\(e2, c) -> (c + cost, e2)) . filter (\(e2, c) -> not $ Set.member e2 visited) $ fromMaybe [] (Map.lookup e es)
     es = edges g
 
 adjacent :: (Integer, Integer) -> [(Integer, Integer)]
@@ -48,10 +37,10 @@ parse s = Graph {nodes = nodes, edges = Map.fromList [(x, [(a, c) | a <- adjacen
     nodeCosts = Map.fromList . concatMap (\(y, row) -> zipWith (\x c -> ((x, y), read [c])) [0 ..] row) . zip [0 ..] $ lines s
     nodes = Map.keys nodeCosts
 
-print :: ([(Integer, Integer)], Integer) -> String
-print = show . snd
+print :: Integer -> String
+print = show
 
-solve1 :: Graph (Integer, Integer) -> ([(Integer, Integer)], Integer)
+solve1 :: Graph (Integer, Integer) -> Integer
 solve1 g = dijkstra g (0, 0) (maximum $ map fst ns, maximum $ map snd ns)
   where
     ns = nodes g
@@ -67,5 +56,5 @@ tile t g = Graph {nodes = ns, edges = Map.fromList [(x, [(a, c) | a <- adjacent 
     my = maximum . map snd $ nodes g
     mx = maximum . map fst $ nodes g
 
-solve2 :: Graph (Integer, Integer) -> ([(Integer, Integer)], Integer)
+solve2 :: Graph (Integer, Integer) -> Integer
 solve2 = solve1 . tile 5
