@@ -24,7 +24,7 @@ getPathY = go 0
     go y v = y : go (y + v) (v - 1)
 
 solve :: ((Integer, Integer), (Integer, Integer)) -> [(Integer, Integer)]
-solve ((minx, maxx), (miny, maxy)) = [(a, b) | a <- [0 .. maxx], b <- [miny .. (- miny)], let as = takeWhile (<= maxx) $ getPathX a, let bs = takeWhile (>= miny) $ getPathY b, let ps = zip as bs, any inbounds ps]
+solve ((minx, maxx), (miny, maxy)) = [(a, b) | a <- [0 .. maxx], b <- [miny .. (- miny)], any inbounds $ takeWhile (\(x, y) -> x <= maxx && y >= miny) $ zip (getPathX a) (getPathY b)]
   where
     inbounds (x, y) = minx <= x && x <= maxx && miny <= y && y <= maxy
 
