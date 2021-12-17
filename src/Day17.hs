@@ -1,9 +1,5 @@
 module Day17 where
 
-import Data.List
-import Data.Set (Set)
-import qualified Data.Set as Set
-
 parse :: String -> ((Integer, Integer), (Integer, Integer))
 parse s = ((minx, maxx), (miny, maxy))
   where
@@ -16,16 +12,24 @@ parse s = ((minx, maxx), (miny, maxy))
 print :: Integer -> String
 print = show
 
-getPath :: (Integer, Integer) -> [(Integer, Integer)]
-getPath = map (foldl (\(x1, y1) (x2, y2) -> (x1 + x2, y1 + y2)) (0, 0)) . inits . iterate (\(x, y) -> (if x == 0 then 0 else x -1, y -1))
+getPathX :: Integer -> [Integer]
+getPathX = go 0
+  where
+    go x 0 = repeat x
+    go x v = x : go (x + v) (v - 1)
 
-solve :: ((Integer, Integer), (Integer, Integer)) -> Set (Integer, Integer)
-solve ((minx, maxx), (miny, maxy)) = Set.fromList [(a, b) | a <- [0 .. maxx], b <- [miny .. (- miny)], any inbounds $ takeWhile (\(x, y) -> x <= maxx && y >= miny) $ getPath (a, b)]
+getPathY :: Integer -> [Integer]
+getPathY = go 0
+  where
+    go y v = y : go (y + v) (v - 1)
+
+solve :: ((Integer, Integer), (Integer, Integer)) -> [(Integer, Integer)]
+solve ((minx, maxx), (miny, maxy)) = [(a, b) | a <- [0 .. maxx], b <- [miny .. (- miny)], let as = takeWhile (<= maxx) $ getPathX a, let bs = takeWhile (>= miny) $ getPathY b, let ps = zip as bs, any inbounds ps]
   where
     inbounds (x, y) = minx <= x && x <= maxx && miny <= y && y <= maxy
 
 solve1 :: ((Integer, Integer), (Integer, Integer)) -> Integer
-solve1 = (\n -> n * (n + 1) `div` 2) . maximum . Set.map snd . solve
+solve1 = (\n -> n * (n + 1) `div` 2) . maximum . map snd . solve
 
 solve2 :: ((Integer, Integer), (Integer, Integer)) -> Integer
-solve2 = toInteger . Set.size . solve
+solve2 = toInteger . length . solve
