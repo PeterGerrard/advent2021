@@ -257,7 +257,7 @@ test-suite Day17Tests
   hs-source-dirs:
     tests
     src
-  build-depends: base >=4.13, split, containers, HUnit
+  build-depends: base >=4.13, split, containers, HUnit, QuickCheck
   other-modules:
     Day17
   default-language: Haskell2010
