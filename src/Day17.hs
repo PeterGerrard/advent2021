@@ -16,14 +16,11 @@ parse s = ((minx, maxx), (miny, maxy))
 print :: Integer -> String
 print = show
 
-gt :: Integer -> Maybe Integer -> Bool
-gt x = maybe False (x >)
-
-rangeMatch :: (Integer, Maybe Integer) -> (Integer, Maybe Integer) -> Bool
-rangeMatch (min1, max1) (min2, max2) = not (gt min1 max2 || gt min2 max1)
+getPath :: (Integer, Integer) -> [(Integer, Integer)]
+getPath = map (foldl (\(x1, y1) (x2, y2) -> (x1 + x2, y1 + y2)) (0, 0)) . inits . iterate (\(x, y) -> (if x == 0 then 0 else x -1, y -1))
 
 solve :: ((Integer, Integer), (Integer, Integer)) -> Set (Integer, Integer)
-solve ((minx, maxx), (miny, maxy)) = Set.fromList [(a, b) | a <- [0 .. maxx], b <- [miny .. (- miny)], l <- takeWhile (\(x, y) -> x <= maxx && y >= miny) . map (foldl (\(x1, y1) (x2, y2) -> (x1 + x2, y1 + y2)) (0, 0)) . inits $ iterate (\(x, y) -> (if x == 0 then 0 else x -1, y -1)) (a, b), inbounds l]
+solve ((minx, maxx), (miny, maxy)) = Set.fromList [(a, b) | a <- [0 .. maxx], b <- [miny .. (- miny)], any inbounds $ takeWhile (\(x, y) -> x <= maxx && y >= miny) $ getPath (a, b)]
   where
     inbounds (x, y) = minx <= x && x <= maxx && miny <= y && y <= maxy
 
