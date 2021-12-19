@@ -15,7 +15,8 @@ import qualified Day14
 import qualified Day15
 import qualified Day16
 import qualified Day17
-import qualified Day18 -- imports
+import qualified Day18
+import qualified Day19 -- imports
 import System.Environment
 
 padLeft :: Int -> a -> [a] -> [a]
@@ -40,7 +41,8 @@ getSolve1 n = case n of
   15 -> Day15.print . Day15.solve1 . Day15.parse
   16 -> Day16.print . Day16.solve1 . Day16.parse
   17 -> Day17.print . Day17.solve1 . Day17.parse
-  18 -> Day18.print  . Day18.solve1 . Day18.parse -- solve1Insert
+  18 -> Day18.print  . Day18.solve1 . Day18.parse
+  19 -> show  . Day19.solve1 . Day19.parse -- solve1Insert
 
 getSolve2 :: Integer -> (String -> String)
 getSolve2 n = case n of
@@ -61,7 +63,8 @@ getSolve2 n = case n of
   15 -> Day15.print . Day15.solve2 . Day15.parse
   16 -> Day16.print . Day16.solve2 . Day16.parse
   17 -> Day17.print . Day17.solve2 . Day17.parse
-  18 -> Day18.print  . Day18.solve2 . Day18.parse -- solve2Insert
+  18 -> Day18.print  . Day18.solve2 . Day18.parse
+  19 -> Day19.print  . Day19.solve2 . Day19.parse -- solve2Insert
 
 getSolver :: Integer -> (Integer -> (String -> String))
 getSolver n = if n == 1 then getSolve1 else getSolve2
