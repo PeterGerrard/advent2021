@@ -3,11 +3,10 @@
 
 module Day19 where
 
-import Data.List (permutations)
+import Data.Either (partitionEithers)
+import Data.List (nub)
 import Data.List.Split (splitOn)
-import Data.Maybe
-import Data.Set (Set)
-import qualified Data.Set as Set
+import qualified Data.Map as Map
 import GHC.TypeLits
 import Numeric.LinearAlgebra.Static
 
@@ -33,20 +32,22 @@ ident = build (\r c -> if r == c then 1 else 0)
 apply :: Transformation -> Coord -> Coord
 apply t = fst . split . (t #>) . (& 1)
 
-reorientate :: Transformation -> Set Coord -> Set Coord
-reorientate t = Set.map (apply t)
+reorientate :: Transformation -> [Coord] -> [Coord]
+reorientate t = map (apply t)
 
 translateMatrix :: Coord -> Transformation
 translateMatrix c = (ident === 0) ||| col (c & 1)
 
-overlap :: Set Coord -> Set Coord -> Set (Set Coord)
-overlap s1 s2 = Set.map (Set.union s1) $ Set.filter ((>= 12) . Set.size . Set.intersection s1) ts2
-  where
-    ts2 = Set.fromList $ map (`reorientate` s2) ts
-    ts = [translateMatrix (p1 - apply r p2) Numeric.LinearAlgebra.Static.<> r | r <- orientations, p1 <- Set.toList s1, p2 <- Set.toList s2]
+-- Get all the offsets that will move at least 12 coordinates from s2 to s1
+overlap :: [Coord] -> [Coord] -> [Coord]
+overlap s1 s2 = Map.keys . Map.filter (>= 12) $ Map.fromListWith (+) [(p1 - p2, 1) | p1 <- s1, p2 <- s2]
 
-parse :: String -> [Set Coord]
-parse = map (Set.fromList . parseScanner) . splitOn [""] . lines
+-- get the larger grid by aligning two scanners
+align2 :: [Coord] -> [Coord] -> [([Coord], Coord)]
+align2 a b = [(map (off +) o, off) | o <- map (`reorientate` b) orientations, off <- overlap a o]
+
+parse :: String -> [[Coord]]
+parse = map parseScanner . splitOn [""] . lines
   where
     parseScanner :: [String] -> [Coord]
     parseScanner = map parseVec . drop 1
@@ -54,26 +55,28 @@ parse = map (Set.fromList . parseScanner) . splitOn [""] . lines
       where
         [a, b, c] = splitOn "," v
 
-print :: Integer -> String
-print = show
-
-tryAdd :: Set Coord -> Set Coord -> Maybe (Set (Set Coord))
-tryAdd a = (\x -> if null x then Nothing else Just x) . overlap a
-
-solve :: [Set Coord] -> [Set Coord]
-solve (x : xs) = go [x] xs []
+align :: [[Coord]] -> [([Coord], Coord)]
+align (x : xs) = go [(x, vec3 0 0 0)] [x] xs
   where
-    go ys [] [] = ys
-    go ys [] zs = go ys zs []
-    go ys (x : xs) zs = case mapMaybe (tryAdd x) ys of
-      [] -> go ys xs (x : zs)
-      ys' -> go (Set.toList $ Set.unions ys') xs zs
+    go result _ [] = result
+    go result (y : ys) zs = go (found ++ result) (map fst found ++ ys) notFound
+      where
+        (found, notFound) =
+          partitionEithers
+            [ maybe (Right scanner) Left . safeHead $ align2 y scanner
+              | scanner <- zs
+            ]
 
-solve1 :: [Set Coord] -> Integer
-solve1 = toInteger . Set.size . head . solve
+safeHead :: [a] -> Maybe a
+safeHead s = if null s then Nothing else Just (head s)
 
-solve2 :: [Set Coord] -> Integer
-solve2 = const 1
+solve1 :: [[Coord]] -> Integer
+solve1 = toInteger . length . nub . concatMap fst . align
+
+solve2 :: [[Coord]] -> Double
+solve2 cs = maximum [(<.> 1) $ abs (b2 - b1) | b1 <- bs, b2 <- bs]
+  where
+    bs = map snd $ align cs
 
 {- ORMOLU_DISABLE -}
 orientations :: [Transformation]
