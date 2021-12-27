@@ -19,7 +19,9 @@ import qualified Day18
 import qualified Day19
 import qualified Day20
 import qualified Day21
-import qualified Day22 -- imports
+import qualified Day22
+import qualified Day24
+import qualified Day23 -- imports
 import System.Environment
 
 padLeft :: Int -> a -> [a] -> [a]
@@ -48,7 +50,8 @@ getSolve1 n = case n of
   19 -> show . Day19.solve1 . Day19.parse
   20 -> Day20.print . Day20.solve1 . Day20.parse
   21 -> Day21.print . Day21.solve1 . Day21.parse
-  22 -> show . Day22.solve . Day22.parse (Just (-50, 50)) -- solve1Insert
+  22 -> show . Day22.solve . Day22.parse (Just (-50, 50))
+  23 -> Day23.print  . Day23.solve1 . Day23.parse -- solve1Insert
 
 getSolve2 :: Integer -> (String -> String)
 getSolve2 n = case n of
@@ -73,7 +76,8 @@ getSolve2 n = case n of
   19 -> show . Day19.solve2 . Day19.parse
   20 -> Day20.print . Day20.solve2 . Day20.parse
   21 -> Day21.print . Day21.solve2 . Day21.parse
-  22 -> show . Day22.solve . Day22.parse Nothing -- solve2Insert
+  22 -> show . Day22.solve . Day22.parse Nothing
+  23 -> Day23.print  . Day23.solve2 . Day23.parse . Day23.adjustInput -- solve2Insert
 
 getSolver :: Integer -> (Integer -> (String -> String))
 getSolver n = if n == 1 then getSolve1 else getSolve2
@@ -85,4 +89,11 @@ main = do
   (d : p : _) <- getArgs
   let (day, part) = (read d, read p)
   input <- readFile $ inputPath day
-  putStr $ getSolver part day input
+  if day == 24 && part == 1 then do
+    result <- Day24.solve1 $ Day24.parse input
+    putStr $ show result
+  else if day == 24 && part == 2 then do
+    result <- Day24.solve2 $ Day24.parse input
+    putStr $ show result
+  else
+    putStr $ getSolver part day input
